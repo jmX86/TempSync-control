@@ -1,0 +1,38 @@
+services:
+  backend:
+    build: backend
+    ports:
+      - 8080:8080
+    environment:
+      - POSTGRES_DB=pg_zavrsni
+      - POSTGRES_PASSWORD=<password_from_db/password.txt>
+      - DB_USERNAME=postgres
+      - DB_PASS=<password_from_db/password.txt>
+      - ADMIN_USERNAME=<username_for_admin_api_access>
+      - ADMIN_PASSWORD=<password_for_admin_api_access>
+      - DYNSEC_ADMIN_PASS=<password_for_admin-user>
+      - MQTT_READINGS_USER=<username_for_readings-admin-user>
+      - MQTT_READINGS_PASS=<password_for_readings-admin-user>
+    networks:
+      - backend-zavrsni
+  db:
+    image: postgres
+    restart: always
+    secrets:
+      - db-password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - backend-zavrsni
+    environment:
+      - POSTGRES_DB=pg_zavrsni
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+    expose:
+      - 5432
+volumes:
+  db-data:
+secrets:
+  db-password:
+    file: db/password.txt
+networks:
+  backend-zavrsni:
